@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <title>Studiumsplan Generator</title>
+
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+  <script defer src="app.js"></script>
+</head>
+<body>
+  <h1>Studiumsplan PDF erstellen</h1>
+
+  <div class="picker">
+    <label>
+      Start:
+      <input type="date" id="start" value="2025-07-01">
+    </label>
+
+    <label>
+      Ende:
+      <input type="date" id="end"   value="2025-08-31">
+    </label>
+  </div>
+
+  <button id="go">PDF generieren</button>
+  <button id="go4">PDF 4-up</button>
+
+  <p class="note">
+    Alles läuft lokal im Browser – es wird nichts hochgeladen.
+  </p>
+</body>
+</html>

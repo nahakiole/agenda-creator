@@ -1,0 +1,5 @@
+body          { font-family: system-ui, sans-serif; margin: 1.5rem 2rem; }
+h1            { margin-bottom: 1.2rem; }
+.picker label { margin-right: 1.5rem; }
+button        { padding: .5rem 1rem; font-size: 1rem; margin-top: .8rem; }
+.note         { color:#666; font-size:.9rem; margin-top:2rem; }
