@@ -141,7 +141,12 @@ function preview(bytes, filename){
   /* ---- 1) File statt Blob ----------------------- */
   const file = new File([bytes], filename, { type: 'application/pdf' });
   const url  = URL.createObjectURL(file);
-  document.getElementById('preview').src = url;
+  const iframe = document.getElementById('preview');
+  iframe.src = url;
+  // Show iframe and hide placeholder background
+  iframe.classList.remove('d-none');
+  const ph = document.getElementById('pdf-placeholder');
+  if (ph) ph.classList.add('d-none');
 
   /* ---- 2) Download-Link wie gehabt -------------- */
   const a = document.getElementById('dl');

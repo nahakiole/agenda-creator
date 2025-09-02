@@ -12,3 +12,31 @@ body {
 
 /* Download-Link erst sichtbar, wenn JavaScript ihn befüllt */
 #dl.d-none { display: none !important; }
+
+/* GitHub Repo Link ------------------------------- */
+.github-icon {
+  width: 28px;
+  height: 28px;
+}
+
+.github-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: opacity 0.15s ease-in-out;
+}
+
+.github-link:hover {
+  opacity: 0.75;
+}
+
+.github-label {
+  font-size: 0.95rem;
+}
+
+/* Dark placeholder for preview area before a PDF exists */
+.pdf-placeholder {
+  background-color: #1f1f1f;
+  width: 100%;
+  height: 100%;
+}
