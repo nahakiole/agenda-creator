@@ -12,9 +12,12 @@ async function makePlan(make4UP) {
   const start = new Date(startStr), end = new Date(endStr);
   if (end < start) return alert('Enddatum liegt vor dem Start!');
 
+  // Basis-Dateiname, z.B. "Studienplan_2025-07-01_bis_2025-08-31"
+  const baseName = `Studienplan_${startStr}_bis_${endStr}`;
+
   // ---------- Wochen-PDF erzeugen ---------------------------------------
   const weeklyDoc = await PDFDocument.create();
-  weeklyDoc.setTitle("Plan");       // oder einen sprechenden Titel
+  weeklyDoc.setTitle(`Studienplan ${startStr} bis ${endStr}`);
 
 
   for (let monday = toMonday(start); monday <= end; monday = addDays(monday, 7))
@@ -22,7 +25,7 @@ async function makePlan(make4UP) {
   const weeklyBytes = await weeklyDoc.save();
 
   if (!make4UP) {
-    preview(weeklyBytes, `Studienplan_${startStr}_${endStr}_weekly.pdf`);
+    preview(weeklyBytes, `${baseName}.pdf`);
     return;
   }
 
@@ -30,7 +33,7 @@ async function makePlan(make4UP) {
   const srcDoc   = await PDFDocument.load(weeklyBytes);            // neu: nachladen
   const fourDoc  = await PDFDocument.create();
 
-  fourDoc.setTitle("Plan");       // oder einen sprechenden Titel
+  fourDoc.setTitle(`Studienplan ${startStr} bis ${endStr} (4-up)`);
 
   const pageCnt  = srcDoc.getPageCount();
   const firstDim = srcDoc.getPage(0).getSize();
@@ -47,8 +50,7 @@ async function makePlan(make4UP) {
       target.drawPage(embedded, { x, y, width: halfW, height: halfH });
     }
   }
-  preview(await fourDoc.save(),
-          `Studienplan_${startStr}_${endStr}_4up.pdf`);
+  preview(await fourDoc.save(), `${baseName}_4up.pdf`);
 }
 
 // ------------------------------------------------------------------
@@ -123,7 +125,8 @@ function preview(bytes, filename){
   a.href = url;
   a.download = filename;
   a.textContent = 'PDF herunterladen';
-  a.style.display = 'inline';
+  // Sicherstellen, dass der Link sichtbar ist
+  a.classList.remove('d-none');
 
   /* ---- 3) Auto-Cleanup -------------------------- */
   setTimeout(()=>URL.revokeObjectURL(url), 10*60*1000);
