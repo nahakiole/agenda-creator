@@ -59,6 +59,24 @@ function toMonday(d){ const wd=d.getDay(); return addDays(d, wd===0? -6 : 1-wd);
 function addDays(d,n){ return new Date(+d + n*86400000); }
 function fmt(d){ return d.toISOString().slice(0,10).split('-').reverse().join('.'); }
 
+// Set default dates: current week's Monday to 4 weeks (28 days) span
+function toYMD(d){
+  const y = d.getFullYear();
+  const m = String(d.getMonth()+1).padStart(2,'0');
+  const day = String(d.getDate()).padStart(2,'0');
+  return `${y}-${m}-${day}`;
+}
+
+function setDefaultDates(){
+  const today  = new Date();
+  const monday = toMonday(today);
+  const end    = addDays(monday, 27); // Sunday of the 4th week
+  const startEl = document.getElementById('start');
+  const endEl   = document.getElementById('end');
+  if (startEl && !startEl.value) startEl.value = toYMD(monday);
+  if (endEl && !endEl.value)     endEl.value   = toYMD(end);
+}
+
 async function drawWeekPage(doc, monday){
   const page = doc.addPage([842,595]);           // A4 quer
   const m = 28;
@@ -74,28 +92,27 @@ async function drawWeekPage(doc, monday){
     { x:m, y:page.getHeight()-m-20, size:12, font:fB }
   );
 
-  // Raster
-  const cols=8, rows=15, cw=gridW/cols, rh=gridH/rows, g=rgb(.6,.6,.6);
-  drawGrid(page,m,gridW,gridH,cw,rh,g);
+  // Raster (ohne separate Zeit-Spalte)
+  const cols=7, rows=15, cw=gridW/cols, rh=gridH/rows, g=rgb(.6,.6,.6);
+  drawGrid(page,m,gridW,gridH,cw,rh,g,cols,rows);
 
   // Spaltenkopf: kurzer Tag + Datum (eine Zeile)
   const days=['Mo','Di','Mi','Do','Fr','Sa','So'];
   days.forEach((d,i)=>{
     page.drawText(`${d} ${fmt(addDays(monday,i))}`,{
-      x:m+(i+1)*cw+2,
+      x:m+i*cw+2,
       y:m+gridH-rh+6,
       size:8,
       font:fB
     });
   });
-  page.drawText('Zeit',{x:m+2,y:m+gridH-rh+6,size:8,font:fB});
 
   // Zeiten + Mini-Labels
   for(let h=8;h<=21;h++){
     const label=`${String(h).padStart(2,'0')}:00`;
     const row=h-8+1;
-    page.drawText(label,{x:m+4,y:m+gridH-(row+1)*rh+4,size:8,font:fR});
-    for(let d=1;d<cols;d++){
+    // Zeit-Label in jeder Zelle (oben rechts, dezent)
+    for(let d=0;d<cols;d++){
       page.drawText(label,{
         x:m+d*cw+cw-18,
         y:m+gridH-(row+1)*rh+rh-8,
@@ -107,10 +124,16 @@ async function drawWeekPage(doc, monday){
   }
 }
 
-function drawGrid(pg,x0,w,h,cw,rh,c){
+function drawGrid(pg,x0,w,h,cw,rh,c, cols, rows){
   pg.drawRectangle({x:x0,y:x0,width:w,height:h,borderColor:c,borderWidth:.5});
-  for(let i=1;i<8;i++){ const x=x0+i*cw; pg.drawLine({start:{x,y:x0},end:{x,y:x0+h},thickness:.5,color:c}); }
-  for(let r=1;r<15;r++){const y=x0+r*rh; pg.drawLine({start:{x:x0,y},end:{x:x0+w,y},thickness:.5,color:c});}
+  for(let i=1;i<cols;i++){
+    const x=x0+i*cw;
+    pg.drawLine({start:{x,y:x0},end:{x,y:x0+h},thickness:.5,color:c});
+  }
+  for(let r=1;r<rows;r++){
+    const y=x0+r*rh;
+    pg.drawLine({start:{x:x0,y},end:{x:x0+w,y},thickness:.5,color:c});
+  }
 }
 
 // ------- PDF-Preview im <iframe> + Download-Link -------------------------
@@ -131,3 +154,6 @@ function preview(bytes, filename){
   /* ---- 3) Auto-Cleanup -------------------------- */
   setTimeout(()=>URL.revokeObjectURL(url), 10*60*1000);
 }
+
+// Initialize default date range on load
+setDefaultDates();
